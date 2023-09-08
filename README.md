@@ -30,3 +30,7 @@ To make changes to the master branch, you must submit a pull request. There are 
 1) After pushing to your branch, a link will be output in terminal: "Create a pull request for 'branchname' on Github by visiting: ...". You can follow this link in your browser.
 2) Or, go to the Github website for the repo. Click on 'Pull requests'. Click 'New pull request' and select your branch. Then click 'Create pull request'.
 Please make sure your pull request has a fitting title and add a description describing your changes. Focus on how your changes impact the overall behavior of the code. You must also add two reviewers. At least one of these reviewers must be a lead (FA23: Amelia Kovacs, Eric Zhang, Taha Jafry, Kevin Cui) and the 'point person' of the project (Will or Jeffrey for FA23).
+
+Remember that the changes you make to this repository will not automatically be included in the onboard software. To include them, you must run the submodule update/init commands in the AutoBoat-Onboard-Software repo. See the README of that repo for more detailed instructions.
+
+Happy coding!!!
