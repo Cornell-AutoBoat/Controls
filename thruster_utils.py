@@ -1,22 +1,22 @@
 import time
 import serial
 import numpy as np
-import src.SFR as SFR
-from  test.msg import MCdata
+import SFR
+from test.msg import Controls
 import pid
 
 # ser = serial.Serial('dev/ttyACMO')
 
 
-def sendValue(valL, valR):
+def send_value(valL, valR):
     valL = clamp(valL)
     valR = clamp(valR)
     print(str(valL) + " " + str(valR))
-    msg = MCdata()
+    SFR.sL, SFR.sR = valL, valR
+    msg = Controls()
     msg.sR = valR
     msg.sL = valL
-    msg.kill = False
-    SFR.mcPub.publish(msg)
+    SFR.cPub.publish(msg)
     # toSend = 'MC R' + str(valR) + ' L' + str(valL)
     # ser.write(str(toSend).encode())
 
@@ -58,9 +58,11 @@ def move_straight(direction="F", v=1.0):
         direction: one of "F" or "B" to easily move forwards or backwards at 1m/s
         v: desired linear velocity. Positive to move forward, negative to move backwards
     """
+    # TODO: maybe change this, fix documentation
     if direction == "B":
-        v = -1.0
-    return transform_to_thrust(v, 0)
+        send_value(1400, 1400)
+    else:
+        send_value(1600, 1600)
 
 
 def move_pivot(direction="R", w=0.5):
@@ -72,25 +74,51 @@ def move_pivot(direction="R", w=0.5):
         w: desired angular velocity. Positive to move counter-clockwise, 
         negative to move clockwise.
     """
+    # TODO: maybe change this, fix documentation
     if direction == "R":
-        w = -w
-    return transform_to_thrust(0, w)
+        send_value(1550, 1450)
+    else:
+        send_value(1450, 1550)
 
 
-def kill_system():
-    msg = MCdata()
-    msg.sL = 1500
-    msg.sR = 1500
-    msg.kill = True
-    SFR.mcPub.publish(msg)
+# def kill_system():
+#     msg = MCdata()
+#     msg.sL = 1500
+#     msg.sR = 1500
+#     msg.kill = True
+#     SFR.mcPub.publish(msg)
     # ser.write('KILL')
 
 
-def break_thrusters(curr_sL, curr_sR, break_time=0.5):
+def break_thrusters(break_time=0.5):
+    # TODO: test this
     # read current signals being supplied to thrusters
-    sL = 3000 - curr_sL
-    sR = 3000 - curr_sR
-    sendValue(sL, sR)
+    sL, sR = 3000 - SFR.sL, 3000 - SFR.sR
+    send_value(sL, sR)
     time.sleep(break_time)
     # kill motors
-    sendValue(1500, 1500)
+    send_value(1500, 1500)
+
+
+def tune_pid_on_heading():
+    print("Tuning pid")
+    desired_heading = SFR.heading
+    data = []
+    offsets = [0, 50, 0, -50, 0, -100, 0, 100, 0, -150, 0, 150, 0]
+    initial_time = time.time()
+    for offset in offsets:
+        send_value(1500 + offset, 1500 - offset)
+        step_time = time.time()
+        while time.time() - step_time < 2:
+            cur_heading = SFR.heading
+            data.append(f"{time.time() - initial_time}, {offset}, {cur_heading - desired_heading}")
+            time.sleep(0.2)
+    write_to_text(data)
+    print("Finished tuning pid")
+
+
+def write_to_text(data):
+    with open('data.txt', 'w') as f:
+        for line in data:
+            f.write(line)
+            f.write('\n')
