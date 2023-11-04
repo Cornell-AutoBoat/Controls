@@ -1,7 +1,7 @@
 from simple_pid import PID
 import thruster_utils
 import time
-import src.SFR as SFR
+import SFR
 import csv
 import numpy as np
 
@@ -26,13 +26,14 @@ def pid_test():
             sR = clamp(v_output + (w_output + prev_w_output) + 1500)
             thruster_utils.sendValue(sL, sR)
             while time.time() - start2 < 3.0:
-                writer.writerow([str(time.time() - start1), str(w_output), str(SFR.ang_vx), str(SFR.ang_vy), str(SFR.ang_vz)])
+                writer.writerow([str(time.time() - start1), str(w_output),
+                                 str(SFR.ang_vx), str(SFR.ang_vy), str(SFR.ang_vz)])
                 print(str(time.time() - start1), str(w_output), str(SFR.ang_vx), str(SFR.ang_vy), str(SFR.ang_vz))
                 time.sleep(0.1)
     SFR.done = True
 
 
-def pid_control(v, w): 
+def pid_control(v, w):
     print("starting pid")
     with open('pid_data_angular', 'w') as f:
         writer = csv.writer(f)

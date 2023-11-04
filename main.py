@@ -5,12 +5,20 @@ import thruster_utils
 from test.msg import Done, MotionPlans, SensorReadings, Controls
 
 
+def conv_msg_to_list(path):
+    # msg.path is of type List[]. We want to convert it to float64[][].
+    new_path = []
+    for lst in path:
+        new_path.append(lst.list)
+    return new_path
+
+
 def control_loop(msg):
     motion = msg.motion_type
     path = msg.path
 
     if motion == "path":
-        pure_pursuit.execute(path)
+        pure_pursuit.execute(conv_msg_to_list(path))
     elif motion == "fwd":
         thruster_utils.move_straight(direction="F")
     elif motion == "bwd":
