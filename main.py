@@ -38,7 +38,7 @@ def callback_sensors(msg):
 
 
 if __name__ == "__main__":
-    rospy.init_node('controls-node', anonymous=True)
+    rospy.init_node('ControlsNode', anonymous=True)
     rospy.Subscriber('motion-plans', MotionPlans, control_loop)
     rospy.Subscriber('sensors', SensorReadings, callback_sensors)
     done_pub = rospy.Publisher('done', Done, queue_size=10)
