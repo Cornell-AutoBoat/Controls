@@ -40,11 +40,11 @@ def callback_sensors(msg):
 
 if __name__ == "__main__":
     rospy.init_node('ControlsNode', anonymous=True)
-    rospy.Subscriber('motion-plans', MotionPlans, control_loop)
+    rospy.Subscriber('motion_plans', MotionPlans, control_loop)
     rospy.Subscriber('sensors', SensorReadings, callback_sensors)
     done_pub = rospy.Publisher('done', Done, queue_size=10)
     SFR.dPub = done_pub
-    controls_pub = rospy.Publisher('motor-signals', Controls, queue_size=10)
+    controls_pub = rospy.Publisher('motor_signals', Controls, queue_size=10)
     SFR.cPub = controls_pub
 
     # Until ros is shutdown, spin and wait for callbacks to be evoked
