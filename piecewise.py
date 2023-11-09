@@ -1,5 +1,5 @@
 import numpy as np
-import src.SFR as SFR
+import SFR
 
 def follow(waypoints):
     for targetPt in waypoints:

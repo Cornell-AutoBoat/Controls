@@ -14,7 +14,7 @@ import time
 import math
 import rospy
 from simple_pid import PID
-from test import Done
+from test.msg import Done
 
 
 def sgn(num):
