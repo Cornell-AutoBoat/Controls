@@ -196,6 +196,8 @@ def execute(waypoints, des_lin_vel=1.0, max_ang_vel=1.6, lookahead=1.0, sec=400)
     # While we are not within goalRadius m of the final waypoint or we have not
     # exceeded our time limit sec, take pure pursuit steps
     while distanceToGoal > goalRadius and time.time() - start < sec:
+        if SFR.stopped:
+            break
 
         # Find the lookahead point
         goalPt, LFindex = pure_pursuit_step(
@@ -222,6 +224,7 @@ def execute(waypoints, des_lin_vel=1.0, max_ang_vel=1.6, lookahead=1.0, sec=400)
 
         distanceToGoal = pt_to_pt_distance([SFR.tx, SFR.tz], waypoints[-1])
 
+    SFR.stopped = False
     msg = Done()
     msg.done = True
     SFR.dPub.publish(msg)

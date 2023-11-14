@@ -9,3 +9,18 @@ dPub = None
 
 # Current motor signals being sent
 sL, sR = 1500, 1500
+
+# Stopped (Stop command sent so quit execution)
+stopped = False
+
+# Stop main loop
+finish = False
+
+# Controls which motion
+motion = None
+
+# Execution path
+path = []
+
+# Callback variable
+callback = False
