@@ -5,8 +5,6 @@ import SFR
 from test.msg import Controls
 import pid
 
-# ser = serial.Serial('dev/ttyACMO')
-
 
 def send_value(valL, valR):
     valL = clamp(valL)
@@ -17,12 +15,7 @@ def send_value(valL, valR):
     msg.sR = valR
     msg.sL = valL
     SFR.cPub.publish(msg)
-    # toSend = 'MC R' + str(valR) + ' L' + str(valL)
-    # ser.write(str(toSend).encode())
-
-
-# def voltage_scale(v):
-#     return 5.513/(-0.004*v**2 + 0.502*v - 1.681)
+    time.sleep(0.1)
 
 
 def clamp(s):
@@ -31,6 +24,7 @@ def clamp(s):
 
 def transform_to_thrust(v, w):
     """
+    ARCHIVED!!!!!!
     Transforms desired linear and angular velocities into signals to the motors
 
     Args:
@@ -79,15 +73,6 @@ def move_pivot(direction="R", w=0.5):
         send_value(1550, 1450)
     else:
         send_value(1450, 1550)
-
-
-# def kill_system():
-#     msg = MCdata()
-#     msg.sL = 1500
-#     msg.sR = 1500
-#     msg.kill = True
-#     SFR.mcPub.publish(msg)
-    # ser.write('KILL')
 
 
 def break_thrusters(break_time=0.5):

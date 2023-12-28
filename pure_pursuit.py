@@ -65,7 +65,7 @@ def move_to_point_step(currentPos, currentHeading, targetPt, desLin, maxAng, pid
 
     # apply proportional controller
     # linearVel = np.clip(Kp_lin * linearError, -desLin, desLin)
-    if turnError > 1 or turnError < -1:
+    if turnError > 1.5 or turnError < -1.5:
         thrust_lin = 1500
     else:
         thrust_lin = desLin
@@ -87,6 +87,8 @@ def pure_pursuit_step(path, currentPos, lookAheadDis, LFindex):
     lastFoundIndex = LFindex
     foundIntersection = False
     startingIndex = lastFoundIndex
+
+    goalPt = [path[lastFoundIndex][0], path[lastFoundIndex][1]]
 
     for i in range(startingIndex, len(path)-1):
 
@@ -200,6 +202,7 @@ def execute(waypoints, des_lin_vel=1.0, max_ang_vel=1.6, lookahead=1.0, sec=400)
         # Find the lookahead point
         goalPt, LFindex = pure_pursuit_step(
             waypoints, [SFR.tx, SFR.tz], lookahead, LFindex)
+        rospy.loginfo("Lookahead pt: " + str(goalPt))
 
         currHeading = SFR.heading
         # currHeading = -get_yaw() + np.pi/2
@@ -207,18 +210,14 @@ def execute(waypoints, des_lin_vel=1.0, max_ang_vel=1.6, lookahead=1.0, sec=400)
         #     currHeading += 2*np.pi
 
         thrust_lin = 1500 + 100*des_lin_vel
-        # Calculate linear and angular velocity needed to reach lookahead point
+        
+        # Calculate motor signals needed to reach lookahead point
         sL, sR = move_to_point_step(
             [SFR.tx, SFR.tz], currHeading, goalPt, thrust_lin, max_ang_vel, pid_heading)
-        # rospy.loginfo("Want to go " + str(v) + "m/s" + str(w) + " rad/s")
-        rospy.loginfo("Lookahead pt: " + str(goalPt))
-
-        # Move the motors to achieve the desired velocities
+        SFR.sL, SFR.sR = sL, sR
         send_value(sL, sR)
-        # sL, sR = transform_to_thrust(v, w)
-        # sL, sR = pid.pid_control(v, w)
 
-        # rospy.loginfo("sending signals L:" + str(sL), " R:" + str(sR))
+        rospy.loginfo("sending signals L:" + str(sL), " R:" + str(sR))
 
         distanceToGoal = pt_to_pt_distance([SFR.tx, SFR.tz], waypoints[-1])
 
